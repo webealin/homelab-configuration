@@ -10,5 +10,7 @@
         "**/node_modules/*/**": true,
         "**/.hg/store/**": true,
         "**/.venv/**": true
-    }
+    },
+    "ansible.lightspeed.enabled": false,
+    "ansible.lightspeed.suggestions.enabled": false
 }
