@@ -1,0 +1,14 @@
+{
+    "python.terminal.activateEnvironment": true,
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "editor.formatOnSave": true,
+    "ansible.python.activationScript": "${workspaceFolder}/.venv/bin/activate",
+    "ansible.python.interpreterPath": "${workspaceFolder}/.venv/bin/python",
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/*/**": true,
+        "**/.hg/store/**": true,
+        "**/.venv/**": true
+    }
+}

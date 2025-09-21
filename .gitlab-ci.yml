@@ -1,0 +1,54 @@
+# .gitlab-ci.yml
+
+stages:
+  - lint
+  - test
+  - apply
+
+ansible:lint:
+  image: python:slim
+  stage: lint
+  before_script:
+    - pip install -r requirements.txt
+  script:
+    - ansible-lint .
+
+ansible:check:
+  image: python:slim
+  stage: test
+  variables:
+    ANSIBLE_HOST_KEY_CHECKING: "false"
+    ANSIBLE_FORCE_COLOR: "true"
+  before_script:
+    - chmod 600 $SSH_KEY $BECOME_PASS $VAULT_PASS
+    - apt-get update && apt-get install -y openssh-client
+    - pip install -r requirements.txt
+    - ansible-galaxy install -r requirements.txt
+  script:
+    - ansible-playbook configure.yml -i inventories/hosts.ini --private-key=$SSH_KEY --become-pass-file=$BECOME_PASS --vault-pass-file=$VAULT_PASS --diff --check
+  rules:
+    - if: "$CI_MERGE_REQUEST_ID"
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE != "trigger"'
+      when: always
+    - when: never
+
+ansible:apply:
+  image: python:slim
+  stage: apply
+  variables:
+    ANSIBLE_HOST_KEY_CHECKING: "false"
+    ANSIBLE_FORCE_COLOR: "true"
+  before_script:
+    - chmod 600 $SSH_KEY $BECOME_PASS $VAULT_PASS
+    - apt-get update && apt-get install -y openssh-client
+    - pip install -r requirements.txt
+    - ansible-galaxy install -r requirements.txt
+  script:
+    - ansible-playbook configure.yml -i inventories/hosts.ini --private-key=$SSH_KEY --become-pass-file=$BECOME_PASS --vault-pass-file=$VAULT_PASS --diff
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "trigger"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual
+    - when: never

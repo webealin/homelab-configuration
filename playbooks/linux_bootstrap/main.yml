@@ -1,0 +1,10 @@
+- name: Configure the root users password
+  hosts: linux
+  become: true
+
+  tasks:
+    - name: Change root password
+      ansible.builtin.user:
+        name: root
+        password: "{{ root_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
+        update_password: yes
