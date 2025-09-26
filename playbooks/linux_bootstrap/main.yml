@@ -30,6 +30,9 @@
   roles:
     - ssh
     - fail2ban
+    - name: geerlingguy.firewall
+      ignore_errors: "{{ ansible_check_mode }}"
+
 
 - name: Enforce default configuration for linux servers
   hosts: linux

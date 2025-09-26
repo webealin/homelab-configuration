@@ -24,6 +24,7 @@ ansible:check:
     - chmod 600 $SSH_KEY $BECOME_PASS $VAULT_PASS
     - apt-get update && apt-get install -y openssh-client
     - pip install -r requirements.txt
+    - ansible-galaxy install -r requirements.yml
   script:
     - ansible-playbook configure.yml -i inventories/hosts.ini --private-key=$SSH_KEY --become-pass-file=$BECOME_PASS --vault-pass-file=$VAULT_PASS --diff --check
   rules:
@@ -43,6 +44,7 @@ ansible:apply:
     - chmod 600 $SSH_KEY $BECOME_PASS $VAULT_PASS
     - apt-get update && apt-get install -y openssh-client
     - pip install -r requirements.txt
+    - ansible-galaxy install -r requirements.yml
   script:
     - ansible-playbook configure.yml -i inventories/hosts.ini --private-key=$SSH_KEY --become-pass-file=$BECOME_PASS --vault-pass-file=$VAULT_PASS --diff
   rules:
