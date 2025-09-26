@@ -1,0 +1,60 @@
+# the following tasks in theory should already have been done by the Cloud-Init script
+# but maybe we changed a password or some other info and want to update these now...
+- name: Ensure that sudo users are configured correctly
+  block:
+    - name: Create local linux admin
+      ansible.builtin.user:
+        name: "{{ local_linux_admin }}"
+        comment: Local Linux Admin
+        shell: /bin/bash
+        group: users
+        password: "{{ local_linux_admin_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
+        update_password: "always"
+        state: present
+
+    - name: Create ansible service account
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        comment: Ansible Service Account
+        # do not set shell to nologin - this will not work!
+        shell: /bin/bash
+        group: users
+        password: "{{ ansible_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
+        update_password: "always"
+        state: present
+
+    - name: Update apt cache if needed
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install sudo
+      ansible.builtin.apt:
+        name: sudo
+        state: present
+
+    - name: Add sudo users to sudo group
+      ansible.builtin.user:
+        name: "{{ item }}"
+        groups: sudo
+        append: true
+        state: present
+      with_items:
+        - "{{ ansible_user }}"
+        - "{{ local_linux_admin }}"
+
+- name: Ensure ansible service account has a .ssh directory
+  ansible.builtin.file:
+    path: /home/{{ ansible_user }}/.ssh
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0700"
+
+- name: "Ensure ansible service account's authorized keys are configured correctly"
+  ansible.builtin.copy:
+    src: authorized_keys_svcansible
+    dest: /home/{{ ansible_user }}/.ssh/authorized_keys
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0600"

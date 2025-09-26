@@ -1,5 +1,8 @@
 # -------------------- User Settings -------------------- #
 root_user_password: "{{ vault_root_user_password }}"
+local_linux_admin: lla
+local_linux_admin_password: "{{ vault_local_linux_admin_password }}"
+ansible_user_password: "{{ vault_ansible_user_password }}"
 
 # ------------------ Firewall Settings ------------------ #
 http_port: "80"

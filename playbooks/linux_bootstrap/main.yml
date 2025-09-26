@@ -1,6 +1,7 @@
 - name: Figure out the SSH port
   hosts: all
   gather_facts: false
+
   tasks:
     - name: Do a SSH port Juggle
       ansible.builtin.import_tasks:
@@ -33,7 +34,6 @@
     - name: geerlingguy.firewall
       ignore_errors: "{{ ansible_check_mode }}"
 
-
 - name: Enforce default configuration for linux servers
   hosts: linux
   vars:
@@ -43,6 +43,7 @@
 
   roles:
     - hostnames
+    - local_sudo_users
 
   tasks:
     - name: Ensure timezone is set to {{ timezone }}
