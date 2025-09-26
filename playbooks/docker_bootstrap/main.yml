@@ -1,0 +1,16 @@
+- name: Configuration for docker servers
+  hosts: docker
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Update apt cache if needed
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+  roles:
+    - role: docker_mount
+    - role: geerlingguy.docker
+      ignore_errors: "{{ ansible_check_mode }}"
+    - role: docker_cron

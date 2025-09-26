@@ -1,0 +1,7 @@
+docker_cron_stop:
+  hour: "01"
+  minute: "00"
+docker_cron_start:
+  hour: "01"
+  minute: "45"
+docker_cron_filter: label=backup.shutdown.enable=true

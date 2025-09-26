@@ -1,0 +1,33 @@
+- name: Ensure parted is installed
+  ansible.builtin.apt:
+    name: parted
+    state: present
+  check_mode: false
+
+- name: Ensure that the drive is partitioned correctly
+  community.general.parted:
+    device: "{{ docker_mount_disk }}"
+    number: "{{ docker_mount_partition_number }}"
+    fs_type: ext4
+    state: present
+
+- name: Ensure that a filesystem exists on {{ docker_mount_disk }}
+  community.general.filesystem:
+    fstype: ext4
+    dev: "{{ docker_mount_partition }}"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Ensure that the /var/lib/docker folder exists
+  ansible.builtin.file:
+    path: /var/lib/docker
+    state: directory
+    owner: root
+    group: root
+    mode: "0710"
+
+- name: Mount /var/lib/docker at new partition {{ docker_mount_partition }}
+  ansible.posix.mount:
+    path: /var/lib/docker
+    src: "{{ docker_mount_partition }}"
+    fstype: ext4
+    state: present

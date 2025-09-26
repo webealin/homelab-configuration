@@ -1,3 +1,20 @@
+# folder where service configuration files will be stored
+docker_dir: /opt/docker
+
+# these are all default and just added for documentation purpose
+docker_edition: "ce"
+docker_packages_state: present
+docker_service_state: started
+docker_service_enabled: true
+
+# use docker compose v2
+docker_install_compose_plugin: true
+docker_compose_package: docker-compose-plugin
+docker_compose_package_state: present
+
+docker_users:
+  - "{{ ansible_user }}"
+
 # firewall is managed by docker, too - so don't flush!
 firewall_flush_rules_and_chains: false
 
@@ -5,3 +22,6 @@ firewall_allowed_tcp_ports:
   - "{{ ssh_port }}"
   - "{{ http_port }}"
   - "{{ https_port }}"
+
+# email to send notifications about docker updates to
+docker_updates_email: "{{ admin_email }}"

@@ -1,0 +1,3 @@
+docker_mount_disk: /dev/vdb
+docker_mount_partition_number: 1
+docker_mount_partition: "{{ docker_mount_disk }}{{ docker_mount_partition_number }}"

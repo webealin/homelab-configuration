@@ -1,0 +1,21 @@
+- name: Ensure cron is installed
+  ansible.builtin.apt:
+    name: cron
+    state: present
+  check_mode: false
+
+- name: Ensure all docker containers are stopped before the backup
+  ansible.builtin.cron:
+    name: "stop containers for backup"
+    minute: "{{ docker_cron_stop.minute }}"
+    hour: "{{ docker_cron_stop.hour }}"
+    job: 'docker stop $(docker ps -aq --filter "{{ docker_cron_filter }}")'
+    state: present
+
+- name: Ensure all docker containers are started after the backup
+  ansible.builtin.cron:
+    name: "start containers after backup"
+    minute: "{{ docker_cron_start.minute }}"
+    hour: "{{ docker_cron_start.hour }}"
+    job: 'docker start $(docker ps -aq --filter "{{ docker_cron_filter }}")'
+    state: present

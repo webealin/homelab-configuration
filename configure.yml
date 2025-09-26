@@ -1,3 +1,7 @@
 - name: Bootstrap Linux Servers
   ansible.builtin.import_playbook:
     playbooks/linux_bootstrap/main.yml
+
+- name: Bootstrap Docker Hosts
+  ansible.builtin.import_playbook:
+    playbooks/docker_bootstrap/main.yml
