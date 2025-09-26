@@ -23,7 +23,7 @@
     line: "{{ item.line }}"
   loop:
     - { regexp: '^127.0.0.1', line: '127.0.0.1      localhost' }
-    - { regexp: '^{{ ansible_host }}', line: '{{ ansible_host }}      {{ inventory_hostname }}.{{ domain }} {{ inventory_hostname }}' }
+    - { regexp: '^{{ ansible_host }}', line: '{{ ansible_host }} {{ inventory_hostname }}.{{ domain }} {{ inventory_hostname }}' }
     - { regexp: '^# The following lines', line: '# The following lines are desirable for IPv6 capable hosts' }
     - { regexp: '^::1', line: '::1            localhost ip6-localhost ip6-loopback' }
     - { regexp: '^fe00::0', line: 'fe00::0                ip6-localnet' }
