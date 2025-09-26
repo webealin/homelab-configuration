@@ -1,0 +1,5 @@
+domain: "{{ vault_domain }}"
+internal_subdomain: internal
+inernal_domain: "{{ internal_subdomain }}.{{ domain }}"
+
+timezone: Europe/Berlin
