@@ -1,0 +1,22 @@
+- name: Install fail2ban
+  ansible.builtin.apt:
+    name: fail2ban
+    state: present
+
+- name: Copy fail2ban custom configuration file into place
+  # note: this does not contain all settings
+  #       it just overwrites some values for the sshd jail from jail.conf
+  ansible.builtin.template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart fail2ban
+
+- name: Ensure fail2ban is running and enabled on boot
+  ansible.builtin.service:
+    name: fail2ban
+    state: started
+    enabled: true
+  when: not ansible_check_mode

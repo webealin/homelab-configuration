@@ -29,6 +29,7 @@
 
   roles:
     - ssh
+    - fail2ban
 
 - name: Enforce default configuration for linux servers
   hosts: linux

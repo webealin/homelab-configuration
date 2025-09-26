@@ -1,0 +1,21 @@
+# File: /etc/fail2ban/jail.local
+# {{ ansible_managed }}
+
+[DEFAULT]
+bantime     = 86400
+findtime    = 600
+maxretry    = 5
+
+destemail   = {{ admin_email }}
+sender      = fail2ban@{{ ansible_hostname }}
+mta         = sendmail
+
+# ban & send an e-mail with whois report and relevant log lines to the destemail.
+action_mwl  = %(action_)s
+              %(mta)s-whois-lines[sender="%(sender)s", dest="%(destemail)s", logpath="%(logpath)s", chain="%(chain)s"]
+
+[sshd]
+enabled     = true
+backend     = systemd
+port        = {{ ssh_port | default('22') }}
+filter      = sshd[mode=aggressive]
