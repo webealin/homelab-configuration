@@ -1,6 +1,6 @@
 domain: "{{ vault_domain }}"
 internal_subdomain: internal
-inernal_domain: "{{ internal_subdomain }}.{{ domain }}"
+internal_domain: "{{ internal_subdomain }}.{{ domain }}"
 admin_email: "{{ vault_admin_email }}"
 info_email: "info@{{ domain }}"
 timezone: Europe/Berlin

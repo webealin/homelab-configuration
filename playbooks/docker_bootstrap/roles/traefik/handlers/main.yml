@@ -1,0 +1,18 @@
+- name: Create and start traefik container
+  community.docker.docker_compose_v2:
+    project_src: "{{ traefik_app_dir }}"
+    state: present
+    recreate: always
+  register: output
+  listen: "Restart traefik"
+  when: not ansible_check_mode
+
+- name: Check that all containers are running
+  ansible.builtin.assert:
+    that:
+      - traefik.State == 'running'
+  vars:
+    traefik: >-
+      {{ output.containers | selectattr("Service", "equalto", "traefik") | first }}
+  listen: "Restart traefik"
+  when: not ansible_check_mode

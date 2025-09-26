@@ -1,0 +1,33 @@
+- name: Create traefik and traefik/dynamic directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  with_items:
+    - "{{ traefik_app_dir }}"
+    - "{{ traefik_app_dir }}/dynamic"
+
+- name: Create the acme.json file if not existant yet
+  ansible.builtin.file:
+    path: "{{ traefik_app_dir }}/acme.json"
+    owner: root
+    group: root
+    mode: "0600"
+    state: touch
+    access_time: preserve
+    modification_time: preserve
+
+- name: Create necessary YAML configuration files
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ traefik_app_dir }}/{{ item.dest_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - { src: "docker-compose.yml.j2", dest_file: "docker-compose.yml" }
+    - { src: "traefik.yml.j2", dest_file: "traefik.yml" }
+    - { src: "dynamic_base.yml.j2", dest_file: "dynamic/base.yml" }
+  notify: Restart traefik

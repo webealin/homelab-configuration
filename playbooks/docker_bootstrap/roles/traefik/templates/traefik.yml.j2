@@ -1,0 +1,114 @@
+################################################################
+# Configuration sample for Traefik v3.5.
+# https://github.com/traefik/traefik/blob/v3.5/traefik.sample.yml
+################################################################
+
+################################################################
+# Global configuration
+################################################################
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
+
+################################################################
+# EntryPoints configuration
+################################################################
+entryPoints:
+  web:
+    address: :80
+    # enable permanent redirecting of all incoming requests to https
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+
+  websecure:
+    address: :443
+    http:
+      tls:
+        certresolver: letsEncrypt
+{% if not traefik_http_challenge %}
+        domains:
+          - main: "{{ domain }}"
+            sans:
+              - "*.{{ domain }}"
+              - "*.{{ internal_domain }}"
+{% endif %}
+      middlewares:
+        - secHeaders@file
+
+# don't try to verify self signed certificates (e.g. proxmox)
+serversTransport:
+  insecureSkipVerify: true
+
+################################################################
+# Traefik logs configuration
+################################################################
+log:
+  level: {{ traefik_loglevel }}
+
+################################################################
+# Access logs configuration
+################################################################
+accessLog: []
+
+################################################################
+# API and dashboard configuration
+################################################################
+{% if traefik_dashboard_enabled %}
+api:
+  dashboard: true
+{% endif %}
+
+################################################################
+# Ping configuration
+################################################################
+#ping:
+#  entryPoint: traefik
+
+################################################################
+# Prometheus metrics
+################################################################
+{% if traefik_prometheus_metrics_enabled %}
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+{% else %}
+metrics: []
+{% endif %}
+
+################################################################
+# Docker configuration backend
+################################################################
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    network: traefik_proxy
+    # 'normalize .Name' is a traefik variable so we have to add braces to tell ansible to evaluate it
+    defaultRule: Host(`{{ '{{ normalize .Name }}' }}.{{ inventory_hostname }}.{{ domain }}`)
+    exposedByDefault: false
+  file:
+    directory: "./dynamic"
+    watch: true
+
+################################################################
+# Let's Encrypt configuration
+################################################################
+certificatesResolvers:
+  letsEncrypt:
+    acme:
+      email: {{ lets_encrypt_mail }}
+      storage: acme.json
+{% if traefik_http_challenge %}
+      httpChallenge:
+        entryPoint: web
+{% else %}
+      dnsChallenge:
+        provider: {{ traefik_dns_challenge_provider }}
+        delayBeforeCheck: 0
+        resolvers:
+          - 1.1.1.1:53
+          - 1.0.0.1:53
+{% endif %}

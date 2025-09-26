@@ -1,0 +1,34 @@
+services:
+  traefik:
+    image: traefik:{{ traefik_image }}
+    container_name: traefik
+    restart: {{ traefik_restart_policy }}
+    security_opt:
+      - "no-new-privileges:true"
+    ports:
+      - {{ http_port }}:80
+      - {{ https_port }}:443
+    networks:
+      - traefik_proxy
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./acme.json:/acme.json
+      - ./traefik.yml:/traefik.yml:ro
+      - ./dynamic:/dynamic:ro
+{% if traefik_dashboard_enabled %}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`{{ traefik_dashboard_url }}`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+{% endif %}
+{% if not traefik_http_challenge %}
+    environment:
+      - CF_API_EMAIL={{ cloudflare_mail }}
+      - CF_DNS_API_TOKEN={{ cloudflare_token }}
+      - CF_ZONE_API_TOKEN={{ cloudflare_token }}
+{% endif %}
+
+networks:
+  traefik_proxy:
+    name: traefik_proxy
