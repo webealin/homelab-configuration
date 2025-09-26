@@ -1,0 +1,37 @@
+# This list of tasks was taken from the following gist:
+# https://gist.github.com/triplepoint/1ad6c6060c0f12112403d98180bcf0b4
+
+- name: SSH Port Juggle
+  check_mode: false
+  block:
+    - name: SSH Port Juggle | define the fallback default SSH port
+      ansible.builtin.set_fact:
+        _default_ssh_port: 22
+
+    - name: SSH Port Juggle | Try configured ansible_port {{ ansible_port }}
+      ansible.builtin.wait_for_connection:
+        timeout: 10
+      ignore_errors: true
+      register: _ssh_port_result
+
+    - name: SSH Port Juggle | Set the ansible_port to the fallback default port {{ _default_ssh_port }}
+      ansible.builtin.set_fact:
+        ansible_port: "{{ _default_ssh_port }}"
+      when:
+        - _ssh_port_result is failed
+
+    - name: SSH Port Juggle | Check fallback default port {{ ansible_port }}
+      ansible.builtin.wait_for_connection:
+        timeout: 10
+      ignore_errors: true
+      register: _ssh_port_default_result
+      when:
+        - _ssh_port_result is failed
+
+    - name: SSH Port Juggle | Fail
+      ansible.builtin.fail:
+        msg: "Neither the configured ansible_port {{ ansible_port }} nor the fallback port {{ _default_ssh_port }} were reachable"
+      when:
+        - _ssh_port_result is failed
+        - _ssh_port_default_result is defined
+        - _ssh_port_default_result is failed

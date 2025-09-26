@@ -1,0 +1,40 @@
+- name: Check if a backup of the original config exists
+  ansible.builtin.stat:
+    path: /etc/ssh/orig_sshd_config.bak
+    get_checksum: false
+  register: ssh_backup
+
+- name: Make a backup of the original config
+  ansible.builtin.copy:
+    src: /etc/ssh/sshd_config
+    dest: /etc/ssh/orig_sshd_config.bak
+    owner: root
+    group: root
+    mode: "0644"
+    remote_src: true
+  when: not ssh_backup.stat.exists
+
+- name: Configure SSH server to use drop-in directory
+  ansible.builtin.template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: "0644"
+    validate: "sshd -t -f %s"
+    backup: true
+  notify: Restart SSH Service
+
+- name: Configure SSH connection using drop-in files
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: /etc/ssh/sshd_config.d/{{ item }}
+    owner: root
+    group: root
+    mode: "0644"
+    validate: "sshd -t -f %s"
+  with_items:
+    - 98-defaults.conf
+    - 99-hardening.conf
+  notify:
+    - Restart SSH Service

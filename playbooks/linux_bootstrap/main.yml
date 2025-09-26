@@ -1,3 +1,11 @@
+- name: Figure out the SSH port
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Do a SSH port Juggle
+      ansible.builtin.import_tasks:
+        tasks/_sshd_port_juggling.yml
+
 - name: Configure the root users password
   hosts: linux
   become: true
@@ -9,8 +17,23 @@
         password: "{{ root_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
         update_password: always
 
+- name: Enforce standard security (ssh, firewall)
+  hosts: linux
+  become: true
+
+  pre_tasks:
+    - name: Update apt cache if needed
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 2600
+
+  roles:
+    - ssh
+
 - name: Enforce default configuration for linux servers
   hosts: linux
+  vars:
+    ansible_port: "{{ ssh_port | default('22') }}"
   become: true
   gather_facts: true
 

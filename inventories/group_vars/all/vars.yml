@@ -3,3 +3,6 @@ internal_subdomain: internal
 inernal_domain: "{{ internal_subdomain }}.{{ domain }}"
 
 timezone: Europe/Berlin
+
+ssh_port: "{{ vault_ssh_port }}"
+ansible_port: "{{ ssh_port }}"

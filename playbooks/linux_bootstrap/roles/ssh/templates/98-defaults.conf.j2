@@ -1,0 +1,42 @@
+# File: /etc/ssh/sshd_config.d/98-defaults.conf
+# {{ ansible_managed }}
+
+# ----------- Network ----------- #
+Port {{ ssh_port | default('22') }}
+AddressFamily inet
+ListenAddress {{ ansible_host }}
+
+# -------- Host Key Type -------- #
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+# ----------- Logging ----------- #
+SyslogFacility AUTH
+LogLevel INFO
+
+# ------- Authentication -------- #
+AuthenticationMethods password,publickey
+PubKeyAuthentication yes
+PasswordAuthentication yes
+
+LoginGraceTime 2m
+MaxAuthTries 3
+UseDns no
+PermitRootLogin no
+PermitEmptyPasswords no
+GSSAPIAuthentication no
+UsePAM yes
+# allow TCP forwarding for VSCode
+AllowTcpForwarding yes
+
+# ------ Language Settings ------ #
+AcceptEnv LANG LC_*
+
+# ------------ sFTP ------------- #
+Subsystem sftp /usr/lib/openssh/sftp-server
+
+# --- Ansible Service Account --- #
+Match User {{ ansible_user }}
+  AuthenticationMethods publickey
+  PubKeyAuthentication yes
+  PasswordAuthentication no
+  AuthorizedKeysFile .ssh/authorized_keys
