@@ -11,15 +11,15 @@
 
 - name: Create docker/gitlab and config directories
   ansible.builtin.file:
-    path: "{{ item }}"
+    path: "{{ item.path }}"
     state: directory
     owner: root
     group: root
-    mode: "0755"
+    mode: "{{ item.mode }}"
   with_items:
-    - "{{ gitlab_app_dir }}"
-    - "{{ gitlab_app_dir }}/config"
-    - "{{ gitlab_runner_app_dir }}"
+    - { path: "{{ gitlab_app_dir }}", mode: "0755" }
+    - { path: "{{ gitlab_app_dir }}/config", mode: "0775" }
+    - { path: "{{ gitlab_runner_app_dir }}", mode: "0755" }
 
 - name: Create gitlab docker-compose YAML
   ansible.builtin.template:
