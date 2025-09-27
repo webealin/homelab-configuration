@@ -1,0 +1,22 @@
+gitlab_app_dir: "{{ docker_dir }}/gitlab"
+gitlab_runner_app_dir: "{{ docker_dir }}/gitlab-runner"
+
+gitlab_restart_policy: unless-stopped
+gitlab_runner_restart_policy: unless-stopped
+gitlab_image: latest
+gitlab_postgres_image: 17
+gitlab_redis_image: latest
+gitlab_runner_image: alpine
+gitlab_runner_default_image: ruby
+
+gitlab_subdomain: gitlab
+gitlab_url: "{{ gitlab_subdomain }}.{{ internal_domain }}"
+gitlab_ssh_port: 22
+gitlab_registry_subdomain: registry
+gitlab_registry_url: "{{ gitlab_registry_subdomain }}.{{ internal_domain }}"
+gitlab_pages_subdomain: pages
+gitlab_pages_url: "{{ gitlab_pages_subdomain }}.{{ internal_domain }}"
+
+gitlab_postgres_user: gitlab
+gitlab_postgres_database: gitlab
+gitlab_service_name: gitlab

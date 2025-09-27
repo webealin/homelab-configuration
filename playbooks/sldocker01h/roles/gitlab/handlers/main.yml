@@ -1,0 +1,43 @@
+- name: Create and start gitlab containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ gitlab_app_dir }}"
+    state: present
+    recreate: always
+  register: output
+  listen: "Restart Gitlab Containers"
+  when: not ansible_check_mode
+
+- name: Check that all containers are running
+  ansible.builtin.assert:
+    that:
+      - gitlab.State == 'running'
+      - postgres.State == 'running'
+      - redis.State == 'running'
+  vars:
+    gitlab: >-
+      {{ output.containers | selectattr("Service", "equalto", "gitlab") | first }}
+    postgres: >-
+      {{ output.containers | selectattr("Service", "equalto", "postgres") | first }}
+    redis: >-
+      {{ output.containers | selectattr("Service", "equalto", "redis") | first }}
+  listen: "Restart Gitlab Containers"
+  when: not ansible_check_mode
+
+- name: Create and start runner container
+  community.docker.docker_compose_v2:
+    project_src: "{{ gitlab_runner_app_dir }}"
+    state: present
+    recreate: always
+  register: output
+  listen: "Restart Runner Container"
+  when: not ansible_check_mode
+
+- name: Check that runner container is running
+  ansible.builtin.assert:
+    that:
+      - runner.State == 'running'
+  vars:
+    runner: >-
+      {{ output.containers | selectattr("Service", "equalto", "runner") | first }}
+  listen: "Restart Runner Container"
+  when: not ansible_check_mode

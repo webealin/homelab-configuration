@@ -1,0 +1,131 @@
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:{{ gitlab_image }}
+    container_name: gitlab
+    restart: {{ gitlab_restart_policy }}
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'https://{{ gitlab_url }}'
+        gitlab_rails['initial_root_password'] = '{{ gitlab_root_password }}'
+        gitlab_rails['signup_enabled'] = false
+
+        # nginx params to redirect from traefik
+        nginx['listen_port'] = 80
+        nginx['listen_https'] = false
+        nginx['proxy_set_headers'] = {
+          "X-Forwarded-Proto" => "https",
+          "X-Forwarded-Ssl" => "on"
+        }
+
+        # Postgres settings
+        postgresql['enable'] = false
+        gitlab_rails['db_adapter'] = 'postgresql'
+        gitlab_rails['db_encoding'] = 'utf8'
+        gitlab_rails['db_host'] = 'postgres'
+        gitlab_rails['db_port'] = 5432
+        gitlab_rails['db_username'] = '{{ gitlab_postgres_user }}'
+        gitlab_rails['db_password'] = '{{ gitlab_postgres_password }}'
+        gitlab_rails['db_database'] = '{{ gitlab_postgres_database }}'
+
+        # SMTP settings
+        gitlab_rails['smtp_enable'] = true
+        gitlab_rails['smtp_address'] = '{{ smtp_host }}'
+        gitlab_rails['smtp_port'] = {{ smtp_port }}
+        gitlab_rails['smtp_domain'] == '{{ domain }}'
+        gitlab_rails['smtp_enable_starttls_auto'] = true
+        gitlab_rails['smtp_openssl_verify_mode'] = 'peer'
+        gitlab_rails['gitlab_email_from'] = 'gitlab@{{ domain }}'
+        gitlab_rails['gitlab_email_reply_to'] = 'noreply@{{ domain }}'
+
+        # LDAP settings
+        gitlab_rails['ldap_enabled'] = true
+        gitlab_rails['ldap_servers'] = {
+          'main' => {
+            'label' => 'LDAP',
+            'host' => '{{ ldap_server }}',
+            'port' => 389,
+            'uid' => 'cn',
+            'encryption' => 'plain',
+            'base' => '{{ ldap_users_base_dn }}',
+            'bind_dn' => 'uid={{ gitlab_service_name }},{{ ldap_services_base_dn }}',
+            'password' => '{{ gitlab_service_password }}',
+            'active_directory' => 'false',
+            'attributes' => {
+              'username' => 'uid',
+              'name' => 'displayName',
+              'first_name' => 'givenName',
+              'last_name' => 'sn'
+            }
+          }
+        }
+
+        # redis
+        gitlab_rails['redis_host'] = 'redis'
+        gitlab_rails['redis_port'] = 6379
+        gitlab_rails['redis_password'] = '{{ gitlab_redis_password }}'
+
+        # registry
+        registry['enable'] = true
+        registry['registry_http_addr'] = "0.0.0.0:5000"
+        registry_external_url 'https://{{ gitlab_registry_url }}'
+        gitlab_rails['registry_enabled'] = true
+        gitlab_rails['registry_api_url'] = 'http://gitlab:5000'
+        registry_nginx['enable'] = false
+
+        # pages
+        gitlab_pages['enable'] = true
+        gitlab_pages['external_http'] = ['0.0.0.0:8081']
+        gitlab_pages['access_control'] = false
+        gitlab_pages['internal_gitlab_server'] = 'http://gitlab:80'
+        pages_external_url 'https://{{ gitlab_pages_url }}'
+        pages_nginx['enable'] = false
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gitlab.rule=Host(`{{ gitlab_url }}`)"
+      - "traefik.http.routers.gitlab.service=gitlab"
+      - "traefik.http.services.gitlab.loadbalancer.server.port=80"
+      - "traefik.http.routers.registry.rule=Host(`{{ gitlab_registry_url }}`)"
+      - "traefik.http.routers.registry.service=registry"
+      - "traefik.http.services.registry.loadbalancer.server.port=5000"
+      - "traefik.http.routers.pages.rule=Host(`{{ gitlab_pages_url }}`)"
+      - "traefik.http.routers.pages.service=pages"
+      - "traefik.http.services.pages.loadbalancer.server.port=8081"
+    volumes:
+      - ./config:/etc/gitlab
+      # registry images are stored in /var/opt/gitlab/gitlab-rails/shared/registry
+      - data:/var/opt/gitlab
+    ports:
+      - '{{ gitlab_ssh_port }}:22'
+    shm_size: '256m'
+    networks:
+      - default
+      - traefik_proxy
+
+  postgres:
+    image: postgres:{{ gitlab_postgres_image }}
+    container_name: gitlab-db
+    restart: {{ gitlab_restart_policy }}
+    environment:
+      POSTGRES_USER: {{ gitlab_postgres_user }}
+      POSTGRES_DATABASE: {{ gitlab_postgres_database }}
+      POSTGRES_PASSWORD: {{ gitlab_postgres_password }}
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  redis:
+    image: redis:{{ gitlab_redis_image }}
+    container_name: gitlab-redis
+    restart: {{ gitlab_restart_policy }}
+    command: redis-server --requirepass {{ gitlab_redis_password }}
+    volumes:
+      - redis_data:/data
+
+volumes:
+  data:
+  logs:
+  db:
+  redis_data:
+
+networks:
+  traefik_proxy:
+    external: true

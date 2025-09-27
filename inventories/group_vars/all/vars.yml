@@ -11,6 +11,8 @@ ansible_port: "{{ ssh_port }}"
 # ldap settings
 domain_base_dn: "{{ vault_domain_base_dn }}"
 ldap_base_dn: "dc={{ internal_subdomain }},{{ domain_base_dn }}"
+ldap_services_base_dn: "ou=services,{{ ldap_base_dn }}"
+ldap_users_base_dn: "ou=users,{{ ldap_base_dn }}"
 ldap_config_password: "{{ vault_ldap_config_password }}"
 ldap_admin_password: "{{ vault_ldap_admin_password }}"
 ldap_server: "{{ hostvars['sldocker01h'].ansible_host }}"
@@ -18,6 +20,13 @@ ldap_auth:
   server_uri: ldap://{{ ldap_server }}/
   bind_dn: "cn=admin,{{ ldap_base_dn }}"
   bind_pw: "{{ ldap_admin_password }}"
+
+# mail settings
+smtp_username: apikey
+smtp_password: "{{ vault_smtp_password }}"
+smtp_host: smtp.sendgrid.net
+smtp_port: 587
+smtp_sender_email: "{{ info_email }}"
 
 # Feature Flags:
 traefik_dashboard_enabled: true

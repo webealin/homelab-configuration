@@ -1,0 +1,24 @@
+concurrent = 1
+check_interval = 0
+shutdown_timeout = 0
+
+[session_server]
+  session_timeout = 1800
+
+[[runners]]
+  name = "Server Docker Runner"
+  url = "https://{{ gitlab_url }}"
+  id = 1
+  token = "{{ gitlab_runner_token }}"
+  token_expires_at = 0001-01-01T00:00:00Z
+  executor = "docker"
+  [runners.cache]
+    MaxUploadedArchiveSize = 0
+  [runners.docker]
+    tls_verify = false
+    image = "{{ gitlab_runner_default_image }}"
+    privileged = true
+    disable_entrypoint_overwrite = false
+    oom_kill_disable = false
+    volumes = ["/cache"]
+    shm_size = 0

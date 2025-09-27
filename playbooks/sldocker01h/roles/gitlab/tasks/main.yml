@@ -1,0 +1,65 @@
+- name: Create gitlab user
+  ansible.builtin.user:
+    name: gitlab
+    shell: /sbin/nologin
+    state: present
+
+- name: Add python3-ldap package (required for ldap_entry module)
+  ansible.builtin.apt:
+    name: python3-ldap
+    state: present
+
+- name: Create docker/gitlab and config directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  with_items:
+    - "{{ gitlab_app_dir }}"
+    - "{{ gitlab_app_dir }}/config"
+    - "{{ gitlab_runner_app_dir }}"
+
+- name: Create gitlab docker-compose YAML
+  ansible.builtin.template:
+    src: "docker-compose.yml.j2"
+    dest: "{{ gitlab_app_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Gitlab Containers
+
+- name: Create runner docker-compose YAML and config file
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ gitlab_runner_app_dir }}/{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "0644"
+  with_items:
+    - {
+      src: "runner.docker-compose.yml.j2",
+      dest: "docker-compose.yml",
+      owner: root,
+      group: root
+    }
+    - {
+      src: "runner.config.toml.j2",
+      dest: "config.toml",
+      owner: root,
+      group: root
+    }
+  notify: Restart Runner Container
+
+- name: Make sure we have an LDAP service account for gitlab
+  community.general.ldap_entry:
+    dn: uid={{ gitlab_service_name }},{{ ldap_services_base_dn }}
+    objectClass: ['account', 'simpleSecurityObject', 'top']
+    attributes:
+      uid: gitlab
+      description: Gitlab Service Account
+      userPassword: "{{ gitlab_service_password }}"
+    bind_dn: "{{ ldap_auth.bind_dn }}"
+    bind_pw: "{{ ldap_auth.bind_pw }}"
+    server_uri: "{{ ldap_auth.server_uri }}"
