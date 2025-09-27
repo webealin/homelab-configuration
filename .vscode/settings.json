@@ -12,5 +12,11 @@
         "**/.venv/**": true
     },
     "ansible.lightspeed.enabled": false,
-    "ansible.lightspeed.suggestions.enabled": false
+    "ansible.lightspeed.suggestions.enabled": false,
+    "conventionalCommits.scopes": [
+        "docs",
+        "ci",
+        "docker",
+        "gitlab"
+    ]
 }
