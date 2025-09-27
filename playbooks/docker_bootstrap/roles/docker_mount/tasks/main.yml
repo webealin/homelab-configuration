@@ -30,4 +30,5 @@
     path: /var/lib/docker
     src: "{{ docker_mount_partition }}"
     fstype: ext4
-    state: present
+    boot: true
+    state: mounted
