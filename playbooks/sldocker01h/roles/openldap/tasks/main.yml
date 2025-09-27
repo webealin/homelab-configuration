@@ -3,3 +3,5 @@
 
 - name: Add all users and groups
   ansible.builtin.import_tasks: seed.yml
+  # openldap might not be started yet in check mode...
+  ignore_errors: "{{ ansible_check_mode }}"
