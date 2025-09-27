@@ -1,0 +1,13 @@
+services:
+  watchtower:
+    image: containrrr/watchtower:{{ watchtower_image }}
+    container_name: watchtower
+    restart: {{ watchtower_restart_policy }}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_MONITOR_ONLY=true
+      - WATCHTOWER_SCHEDULE={{ watchtower_schedule }}
+      - WATCHTOWER_NOTIFICATIONS=shoutrrr
+      - WATCHTOWER_NOTIFICATION_URL={{ watchtower_webhook }}

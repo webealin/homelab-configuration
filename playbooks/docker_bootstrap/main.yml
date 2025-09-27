@@ -15,3 +15,4 @@
       ignore_errors: "{{ ansible_check_mode }}"
     - role: docker_cron
     - role: traefik
+    - role: watchtower

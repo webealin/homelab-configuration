@@ -32,3 +32,7 @@ traefik_prometheus_metrics_enabled: true
 lets_encrypt_mail: "{{ vault_lets_encrypt_mail }}"
 cloudflare_mail: "{{ admin_email }}"
 cloudflare_token: "{{ vault_cloudflare_token }}"
+
+# notifications
+pushover_user_key: "{{ vault_pushover_user_key }}"
+watchtower_pushover_token: "{{ vault_watchtower_pushover_token }}"

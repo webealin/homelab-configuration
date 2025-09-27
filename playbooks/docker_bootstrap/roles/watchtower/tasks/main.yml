@@ -1,0 +1,16 @@
+- name: Create docker/watchtower directory
+  ansible.builtin.file:
+    path: "{{ watchtower_app_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create necessary YAML configuration files
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ watchtower_app_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: "Restart Watchtower"

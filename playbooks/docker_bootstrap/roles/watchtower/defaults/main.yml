@@ -1,0 +1,6 @@
+watchtower_app_dir: "{{ docker_dir }}/watchtower"
+watchtower_restart_policy: unless-stopped
+watchtower_image: latest
+
+watchtower_schedule: 0 30 0 * * *
+watchtower_webhook: "pushover://shoutrrr:{{ watchtower_pushover_token }}@{{ pushover_user_key }}/"
