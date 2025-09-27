@@ -2,7 +2,7 @@ traefik_app_dir: "{{ docker_dir }}/traefik"
 traefik_restart_policy: unless-stopped
 traefik_image: latest
 
-traefik_loglevel: WARNING
+traefik_loglevel: WARN
 traefik_dashboard_enabled: false
 traefik_dashboard_url: "traefik-{{ inventory_hostname }}.{{ domain }}"
 traefik_http_challenge: false

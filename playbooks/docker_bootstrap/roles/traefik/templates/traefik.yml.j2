@@ -84,15 +84,16 @@ metrics: []
 ################################################################
 # Docker configuration backend
 ################################################################
-docker:
-  endpoint: "unix:///var/run/docker.sock"
-  network: traefik_proxy
-  # 'normalize .Name' is a traefik variable so we have to add braces to tell ansible to evaluate it
-  defaultRule: Host(`{{ '{{ normalize .Name }}' }}.{{ inventory_hostname }}.{{ domain }}`)
-  exposedByDefault: false
-file:
-  directory: "./dynamic"
-  watch: true
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    network: traefik_proxy
+    # 'normalize .Name' is a traefik variable so we have to add braces to tell ansible to evaluate it
+    defaultRule: Host(`{{ '{{ normalize .Name }}' }}.{{ inventory_hostname }}.{{ domain }}`)
+    exposedByDefault: false
+  file:
+    directory: "./dynamic"
+    watch: true
 
 ################################################################
 # Let's Encrypt configuration
