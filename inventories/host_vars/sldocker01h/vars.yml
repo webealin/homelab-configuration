@@ -10,5 +10,3 @@ firewall_allowed_tcp_ports:
   - "{{ ssh_port }}"
   - "{{ http_port }}"
   - "{{ https_port }}"
-  - "{{ ldap_port }}"
-  - "{{ ldaps_port }}"
