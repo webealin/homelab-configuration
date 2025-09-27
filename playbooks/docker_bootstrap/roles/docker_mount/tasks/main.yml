@@ -11,7 +11,7 @@
     fs_type: ext4
     state: present
 
-- name: Ensure that a filesystem exists on {{ docker_mount_disk }}
+- name: Ensure that a filesystem exists on {{ docker_mount_partition }}
   community.general.filesystem:
     fstype: ext4
     dev: "{{ docker_mount_partition }}"
