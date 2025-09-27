@@ -5,3 +5,7 @@
 - name: Bootstrap Docker Hosts
   ansible.builtin.import_playbook:
     playbooks/docker_bootstrap/main.yml
+
+- name: Install software on Docker Host 01
+  ansible.builtin.import_playbook:
+    playbooks/sldocker01h/main.yml

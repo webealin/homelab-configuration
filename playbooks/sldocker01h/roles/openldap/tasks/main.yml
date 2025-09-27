@@ -1,0 +1,5 @@
+- name: Create and start openldap containers
+  ansible.builtin.import_tasks: bootstrap.yml
+
+- name: Add all users and groups
+  ansible.builtin.import_tasks: seed.yml

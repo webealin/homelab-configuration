@@ -1,0 +1,14 @@
+ldap_groups:
+  - {name: family, displayName: 'Familie', description: 'Group of Family Users'}
+  - {name: admin, displayName: 'Admins', description: 'Group of Admin Users', role: 'admin'}
+  - {name: friends, displayName: 'Freunde', description: 'Group of Friend Users'}
+
+users: "{{ vault_users }}"
+initial_password: "{{ vault_initial_password }}"
+
+firewall_allowed_tcp_ports:
+  - "{{ ssh_port }}"
+  - "{{ http_port }}"
+  - "{{ https_port }}"
+  - "{{ ldap_port }}"
+  - "{{ ldaps_port }}"

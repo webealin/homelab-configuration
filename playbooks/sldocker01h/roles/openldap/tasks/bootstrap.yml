@@ -1,0 +1,32 @@
+- name: Add python3-ldap package (required for ldap_entry module)
+  ansible.builtin.apt:
+    name: python3-ldap
+    state: present
+  check_mode: false
+
+- name: Create app and config directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  with_items:
+    - "{{ openldap_app_dir }}"
+    - "{{ openldap_app_dir }}/ldif"
+
+- name: Create docker-compose YAML and ldap seed
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ openldap_app_dir }}/{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - {src: 'docker-compose.yml.j2', dest: 'docker-compose.yml'}
+    - {src: '99-config.ldif.j2', dest: 'ldif/99-config.ldif'}
+    - {src: '98-data.ldif.j2', dest: 'ldif/98-data.ldif'}
+  notify: "Restart Openldap"
+
+- name: Flush handlers to assert that containers are started
+  ansible.builtin.meta: flush_handlers

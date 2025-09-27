@@ -1,0 +1,10 @@
+openldap_app_dir: "{{ docker_dir }}/openldap"
+openldap_restart_policy: unless-stopped
+openldap_image: latest
+
+openldap_domain: "{{ internal_domain }}"
+openldap_organisation: Homelab
+
+openldap_admin_enabled: false
+openldap_subdomain: ldap
+openldap_admin_url: "{{ openldap_subdomain }}.{{ internal_domain }}"

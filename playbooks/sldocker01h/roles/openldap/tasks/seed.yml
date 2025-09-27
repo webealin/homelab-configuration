@@ -1,0 +1,60 @@
+- name: Add users to openldap
+  community.general.ldap_entry:
+    dn: cn={{ item.name | lower }}.{{ item.surname | lower }},ou=users,{{ ldap_base_dn }}
+    objectClass: ['inetOrgPerson', 'top']
+    attributes:
+      cn: "{{ item.name | lower }}.{{ item.surname | lower }}"
+      displayName: "{{ item.name | capitalize }} {{ item.surname | capitalize }}"
+      givenname: "{{ item.name | capitalize }}"
+      mail: "{{ item.mail }}"
+      sn: "{{ item.surname | capitalize }}"
+      userpassword: "{{ initial_password }}"
+    bind_dn: "{{ ldap_auth.bind_dn }}"
+    bind_pw: "{{ ldap_auth.bind_pw }}"
+    server_uri: "{{ ldap_auth.server_uri }}"
+  loop: "{{ users }}"
+
+- name: Add all groups
+  community.general.ldap_entry:
+    dn: cn={{ item.name }},ou=groups,{{ ldap_base_dn }}
+    objectClass: ['groupOfUniqueNames', 'top']
+    attributes:
+      cn: "{{ item.name }}"
+      # displayName: "{{ item.displayName }}"
+      description: "{{ item.description }}"
+      uniquemember: ''
+    bind_dn: "{{ ldap_auth.bind_dn }}"
+    bind_pw: "{{ ldap_auth.bind_pw }}"
+    server_uri: "{{ ldap_auth.server_uri }}"
+  loop: "{{ ldap_groups }}"
+
+- name: Add all users to their corresponding group
+  community.general.ldap_attrs:
+    dn: cn={{ item.group }},ou=groups,{{ ldap_base_dn }}
+    attributes:
+      uniquemember: "cn={{ item.name | lower }}.{{ item.surname | lower }},ou=users,{{ ldap_base_dn }}"
+    state: present
+    bind_dn: "{{ ldap_auth.bind_dn }}"
+    bind_pw: "{{ ldap_auth.bind_pw }}"
+    server_uri: "{{ ldap_auth.server_uri }}"
+  loop: "{{ users }}"
+
+- name: Print all users having a role attached
+  ansible.builtin.debug:
+    msg: "{{ (ldap_groups | json_query(ldap_query))[0] }}"
+  vars:
+    ldap_query: "[?role=='{{ item.role }}'].name"
+  loop: "{{ users | selectattr('role', 'defined') }}"
+
+- name: Add all users to the group corresponding to their role
+  community.general.ldap_attrs:
+    dn: cn={{ (ldap_groups | json_query(ldap_query))[0] }},ou=groups,{{ ldap_base_dn }}
+    attributes:
+      uniquemember: "cn={{ item.name | lower }}.{{ item.surname | lower }},ou=users,{{ ldap_base_dn }}"
+    state: present
+    bind_dn: "{{ ldap_auth.bind_dn }}"
+    bind_pw: "{{ ldap_auth.bind_pw }}"
+    server_uri: "{{ ldap_auth.server_uri }}"
+  vars:
+    ldap_query: "[?role=='{{ item.role }}'].name"
+  loop: "{{ users | selectattr('role', 'defined') }}"

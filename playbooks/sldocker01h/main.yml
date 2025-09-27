@@ -1,0 +1,6 @@
+- name: Install software on Docker Host 01
+  hosts: sldocker01h
+  become: true
+
+  roles:
+    - openldap

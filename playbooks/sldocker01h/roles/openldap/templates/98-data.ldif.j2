@@ -1,0 +1,25 @@
+version: 1
+
+# Entry: ou=users,{{ ldap_base_dn }}
+dn: ou=users,{{ ldap_base_dn }}
+objectclass: organizationalUnit
+objectclass: top
+ou: users
+
+# Entry: ou=groups,{{ ldap_base_dn }}
+dn: ou=groups,{{ ldap_base_dn }}
+objectclass: organizationalUnit
+objectclass: top
+ou: groups
+
+# Entry: ou=services,{{ ldap_base_dn }}
+dn: ou=services,{{ ldap_base_dn }}
+objectclass: organizationalUnit
+objectclass: top
+ou: services
+
+# Entry: ou=authentication,ou=services,{{ ldap_base_dn }}
+dn: ou=authentication,ou=services,{{ ldap_base_dn }}
+objectclass: organizationalUnit
+objectclass: top
+ou: authentication

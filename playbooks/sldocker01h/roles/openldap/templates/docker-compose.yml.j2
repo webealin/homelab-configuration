@@ -1,0 +1,67 @@
+services:
+  openldap:
+    image: osixia/openldap:{{ openldap_image }}
+    container_name: openldap
+    restart: {{ openldap_restart_policy }}
+    ports:
+      - {{ ldap_port }}:389
+      - {{ ldaps_port }}:636
+    environment:
+      - LDAP_LOG_LEVEL=256
+      - LDAP_ORGANISATION={{ openldap_organisation }}
+      - LDAP_DOMAIN={{ openldap_domain }}
+      - LDAP_BASE_DN={{ ldap_base_dn }}
+      - LDAP_ADMIN_PASSWORD={{ ldap_admin_password }}
+      - LDAP_CONFIG_PASSWORD={{ ldap_config_password }}
+      - LDAP_READONLY_USER=false
+      - LDAP_RFC2307BIS_SCHEMA=false
+      - LDAP_BACKEND=mdb
+      # - LDAP_TLS=true
+      # - LDAP_TLS_CRT_FILENAME=ldap.crt
+      # - LDAP_TLS_KEY_FILENAME=ldap.key
+      # - LDAP_TLS_DH_PARAM_FILENAME=dhaparam.pem
+      # - LDAP_TLS_CA_CRT_FILENAME=ca.crt
+      # - LDAP_TLS_ENFORCE=false
+      # - LDAP_TLS_CIPHER_SUITE=SECURE256:-VERS-SSL3.0
+      # - LDAP_TLS_VERIFY_CLIENT=demand
+      # - LDAP_REPLICATION=false
+      # - KEEP_EXISTING_CONFIG=false
+      # - LDAP_REMOVE_CONFIG_AFTER_SETUP=true
+      # - LDAP_SSL_HELPER_PREFIX=ldap
+    command: --copy-service
+    volumes:
+      - ldap_data:/var/lib/ldap
+      - ldap_config:/etc/ldap/slapd.d
+      - ./ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom:ro
+      # - ./certs:/container/service/slapd/assets/certs:ro
+    networks:
+      - auth_internal
+  
+{% if openldap_admin_enabled %}
+  phpldapadmin:
+    image: osixia/phpldapadmin:{{ openldap_image }}
+    container_name: phpldapadmin
+    restart: {{ openldap_restart_policy }}
+
+    environment:
+      - PHPLDAPADMIN_LDAP_HOSTS=openldap
+      - PHPLDAPADMIN_HTTPS=false
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ldap.rule=Host(`{{ openldap_admin_url }}`)"
+    depends_on:
+      - openldap
+    networks:
+      - auth_internal
+      - traefik_proxy
+{% endif %}
+
+volumes:
+  ldap_data:
+  ldap_config:
+
+networks:
+  auth_internal:
+    name: auth_internal
+  traefik_proxy:
+    external: true

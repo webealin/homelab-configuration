@@ -27,8 +27,6 @@ firewall_allowed_tcp_ports:
 docker_updates_email: "{{ admin_email }}"
 
 # traefik settings (including cloudflare)
-traefik_dashboard_enabled: true
-traefik_prometheus_metrics_enabled: true
 lets_encrypt_mail: "{{ vault_lets_encrypt_mail }}"
 cloudflare_mail: "{{ admin_email }}"
 cloudflare_token: "{{ vault_cloudflare_token }}"

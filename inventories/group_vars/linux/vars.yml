@@ -7,6 +7,8 @@ ansible_user_password: "{{ vault_ansible_user_password }}"
 # ------------------ Firewall Settings ------------------ #
 http_port: "80"
 https_port: "443"
+ldap_port: "389"
+ldaps_port: "636"
 
 # default firewall settings for linux servers
 # overridden by firewall rules specified for specific servers in their group or host vars!
