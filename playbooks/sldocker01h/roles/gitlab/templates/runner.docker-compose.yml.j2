@@ -1,6 +1,6 @@
 services:
   runner:
-    image: gitlab-runner:{{ gitlab_runner_image }}
+    image: gitlab/gitlab-runner:{{ gitlab_runner_image }}
     container_name: gitlab-runner
     restart: {{ gitlab_runner_restart_policy }}
     volumes:
