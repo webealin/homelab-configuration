@@ -17,6 +17,7 @@
         "docs",
         "ci",
         "docker",
-        "gitlab"
+        "gitlab",
+        "dns"
     ]
 }
