@@ -1,0 +1,6 @@
+pihole_app_dir: "{{ docker_dir }}/pihole"
+pihole_restart_policy: unless-stopped
+pihole_image: latest
+
+pihole_subdomain: pihole
+pihole_url: "{{ pihole_subdomain }}.{{ internal_domain }}"

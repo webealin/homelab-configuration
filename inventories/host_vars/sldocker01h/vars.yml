@@ -16,3 +16,5 @@ gitlab_postgres_password: "{{ vault_gitlab_postgres_password }}"
 gitlab_service_password: "{{ vault_gitlab_service_password }}"
 gitlab_redis_password: "{{ vault_gitlab_redis_password }}"
 gitlab_runner_token: "{{ vault_gitlab_runner_token }}"
+
+pihole_admin_password: "{{ vault_pihole_admin_password }}"

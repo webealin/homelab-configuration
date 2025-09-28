@@ -1,0 +1,31 @@
+services:
+  pihole:
+    image: pihole/pihole:{{ pihole_image }}
+    container_name: pihole
+    restart: {{ pihole_restart_policy }}
+    environment:
+      TZ: "{{ timezone }}"
+      FTLCONF_webserver_api_password: "{{ pihole_admin_password }}"
+      # If using Docker's default `bridge` network setting the dns listening mode should be set to 'all'
+      FTLCONF_dns_listeningMode: "all"
+      PIHOLE_UID: {{ pihole_user.uid }}
+      PIHOLE_GID: {{ pihole_user.group }}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pihole.rule=Host(`{{ pihole_url }}`)"
+      - "traefik.http.services.pihole.loadbalancer.server.port=80"
+    volumes:
+      # For persisting Pi-hole's databases and common configuration file
+      - data:/etc/pihole
+    ports:
+      - "{{ dns_port }}:53/tcp"
+      - "{{ dns_port }}:53/udp"
+    networks:
+      - traefik_proxy
+
+volumes:
+  data:
+
+networks:
+  traefik_proxy:
+    external: true

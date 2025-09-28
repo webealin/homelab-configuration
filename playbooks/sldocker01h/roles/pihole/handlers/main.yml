@@ -1,0 +1,25 @@
+- name: Restart systemd-resolved
+  ansible.builtin.service:
+    name: systemd-resolved
+    state: restarted
+  listen: "Restart systemd-resolved"
+  when: not ansible_check_mode
+
+- name: Create and start pihole container
+  community.docker.docker_compose_v2:
+    project_src: "{{ pihole_app_dir }}"
+    state: present
+    recreate: always
+  register: output
+  listen: "Restart Pihole"
+  when: not ansible_check_mode
+
+- name: Check that the container is running
+  ansible.builtin.assert:
+    that:
+      - pihole.State == 'running'
+  vars:
+    pihole: >-
+      {{ output.containers | selectattr("Service", "equalto", "pihole") | first }}
+  listen: "Restart Pihole"
+  when: not ansible_check_mode

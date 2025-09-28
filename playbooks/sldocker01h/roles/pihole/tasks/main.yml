@@ -1,0 +1,32 @@
+- name: Create pihole user
+  ansible.builtin.user:
+    name: pihole
+    comment: Pihole Service Account
+    shell: /sbin/nologin
+    create_home: false
+    state: present
+  register: pihole_user
+
+- name: Disable systemd-resolved DnsStubListener
+  ansible.builtin.lineinfile:
+    dest: /etc/systemd/resolved.conf
+    regexp: "^#?DNSStubListener="
+    line: "DNSStubListener=no"
+  notify: Restart systemd-resolved
+
+- name: Create docker/pihole directory
+  ansible.builtin.file:
+    path: "{{ pihole_app_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Create pihole docker-compose YAML
+  ansible.builtin.template:
+    src: "docker-compose.yml.j2"
+    dest: "{{ pihole_app_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Pihole
