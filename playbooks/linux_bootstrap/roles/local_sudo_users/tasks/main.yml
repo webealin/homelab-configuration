@@ -7,7 +7,6 @@
         name: "{{ local_linux_admin }}"
         comment: Local Linux Admin
         shell: /bin/bash
-        group: users
         password: "{{ local_linux_admin_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
         update_password: "always"
         state: present
@@ -18,7 +17,6 @@
         comment: Ansible Service Account
         # do not set shell to nologin - this will not work!
         shell: /bin/bash
-        group: users
         password: "{{ ansible_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
         update_password: "always"
         state: present

@@ -20,7 +20,6 @@
     objectClass: ['groupOfUniqueNames', 'top']
     attributes:
       cn: "{{ item.name }}"
-      # displayName: "{{ item.displayName }}"
       description: "{{ item.description }}"
       uniquemember: ''
     bind_dn: "{{ ldap_auth.bind_dn }}"
