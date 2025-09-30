@@ -1,0 +1,5 @@
+terraform_user: svcterraform
+
+firewall_allowed_tcp_ports:
+  - "{{ ssh_port }}"
+  - "{{ proxmox_port }}"

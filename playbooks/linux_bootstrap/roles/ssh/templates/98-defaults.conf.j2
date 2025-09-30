@@ -40,3 +40,12 @@ Match User {{ ansible_user }}
   PubKeyAuthentication yes
   PasswordAuthentication no
   AuthorizedKeysFile .ssh/authorized_keys
+
+{% if 'proxmox' in group_names %}
+# --- Terraform Service Account --- #
+Match User {{ terraform_user }}
+  AuthenticationMethods publickey
+  PubKeyAuthentication yes
+  PasswordAuthentication no
+  AuthorizedKeysFile .ssh/authorized_keys
+{% endif %}
