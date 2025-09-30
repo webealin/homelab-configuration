@@ -4,7 +4,7 @@ gitlab_runner_app_dir: "{{ docker_dir }}/gitlab-runner"
 gitlab_restart_policy: unless-stopped
 gitlab_runner_restart_policy: unless-stopped
 gitlab_image: latest
-gitlab_postgres_image: 17
+gitlab_postgres_image: 18
 gitlab_redis_image: latest
 gitlab_runner_image: alpine
 gitlab_runner_default_image: ruby

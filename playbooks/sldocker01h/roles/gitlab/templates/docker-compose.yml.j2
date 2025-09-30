@@ -109,8 +109,9 @@ services:
       POSTGRES_USER: {{ gitlab_postgres_user }}
       POSTGRES_DATABASE: {{ gitlab_postgres_database }}
       POSTGRES_PASSWORD: {{ gitlab_postgres_password }}
+      PG_DATA: /var/lib/postgresql/{{ gitlab_postgres_image }}/docker
     volumes:
-      - db:/var/lib/postgresql/data
+      - db:/var/lib/postgresql
 
   redis:
     image: redis:{{ gitlab_redis_image }}
