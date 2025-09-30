@@ -1,0 +1,70 @@
+# run this with: ansible-playbook proxmox_pre.yml --ask-pass -e "terraform_public_key='ssh-ed25519 ...'" -e "ansible_public_key='ssh-ed25519 ...'"
+# See docs at: https://registry.terraform.io/providers/bpg/proxmox/latest/docs#ssh-user
+
+- name: Create service accounts for terraform and ansible
+  hosts: proxmox
+  vars:
+    ansible_port: 22
+    ansible_user: root
+  remote_user: root
+  gather_facts: true
+
+  tasks:
+    - name: Create terraform service account
+      ansible.builtin.user:
+        name: "{{ terraform_user }}"
+        comment: Terraform Service Account
+        shell: /bin/bash
+        state: present
+
+    - name: Add authorized key for {{ terraform_user }}
+      ansible.posix.authorized_key:
+        user: "{{ terraform_user }}"
+        key: "{{ terraform_public_key }}"
+        comment: "gitlab terraform"
+        exclusive: true
+        state: present
+
+    - name: Create ansible service account
+      ansible.builtin.user:
+        name: "svcansible"
+        comment: Ansible Service Account
+        # do not set shell to nologin - this will not work!
+        shell: /bin/bash
+        password: "{{ ansible_user_password | password_hash('sha512', 65534 | random(seed=inventory_hostname) | string) }}"
+        update_password: "always"
+        state: present
+
+    - name: Add authorized key for svcansible
+      ansible.posix.authorized_key:
+        user: "svcansible"
+        key: "{{ ansible_public_key }}"
+        comment: "gitlab ansible"
+        exclusive: true
+        state: present
+
+    - name: Install sudo
+      ansible.builtin.apt:
+        name: sudo
+        state: present
+
+    - name: Allow sudo commands for terraform user without password
+      community.general.sudoers:
+        name: terraform
+        user: "{{ terraform_user }}"
+        commands:
+          - /sbin/pvesm
+          - /sbin/qm
+          - /usr/bin/tee /var/lib/vz/*
+          - /usr/bin/tee /mnt/pve/cephfs/*
+        nopassword: true
+        validation: required
+        state: present
+
+    - name: Allow sudo commands for svcansible
+      community.general.sudoers:
+        name: ansible
+        user: svcansible
+        commands: ALL
+        validation: required
+        state: present
