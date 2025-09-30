@@ -14,6 +14,19 @@
     mode: "0644"
   notify: Restart fail2ban
 
+- name: Copy proxmox jail and filter files
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: /etc/fail2ban/{{ item.dest }}
+    owner: root
+    group: root
+    mode: "0644"
+  with_items:
+    - { src: "proxmox_jail.conf", dest: "jail.d/proxmox.conf" }
+    - { src: "proxmox_filter.conf", dest: "filter.d/proxmox.conf" }
+  notify: Restart fail2ban
+  when: "'proxmox' in group_names"
+
 - name: Ensure fail2ban is running and enabled on boot
   ansible.builtin.service:
     name: fail2ban

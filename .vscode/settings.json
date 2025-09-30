@@ -18,6 +18,7 @@
         "ci",
         "docker",
         "gitlab",
-        "dns"
+        "dns",
+        "security"
     ]
 }
