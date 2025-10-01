@@ -21,12 +21,13 @@ ansible:check:
     ANSIBLE_HOST_KEY_CHECKING: "false"
     ANSIBLE_FORCE_COLOR: "true"
   before_script:
-    - chmod 600 $SSH_KEY $BECOME_PASS $VAULT_PASS
+    - echo "$SSH_KEY" | base64 -d > ./ssh_key
+    - chmod 600 ./ssh_key $BECOME_PASS $VAULT_PASS
     - apt-get update && apt-get install -y openssh-client
     - pip install -r requirements.txt
     - ansible-galaxy install -r requirements.yml
   script:
-    - ansible-playbook configure.yml -i inventories/hosts.ini --private-key=$SSH_KEY --become-pass-file=$BECOME_PASS --vault-pass-file=$VAULT_PASS --diff --check
+    - ansible-playbook configure.yml -i inventories/hosts.ini --private-key=./ssh_key --become-pass-file=$BECOME_PASS --vault-pass-file=$VAULT_PASS --diff --check
   rules:
     - if: "$CI_MERGE_REQUEST_ID"
       when: always
@@ -41,12 +42,13 @@ ansible:apply:
     ANSIBLE_HOST_KEY_CHECKING: "false"
     ANSIBLE_FORCE_COLOR: "true"
   before_script:
-    - chmod 600 $SSH_KEY $BECOME_PASS $VAULT_PASS
+    - echo "$SSH_KEY" | base64 -d > ./ssh_key
+    - chmod 600 ./ssh_key $BECOME_PASS $VAULT_PASS
     - apt-get update && apt-get install -y openssh-client
     - pip install -r requirements.txt
     - ansible-galaxy install -r requirements.yml
   script:
-    - ansible-playbook configure.yml -i inventories/hosts.ini --private-key=$SSH_KEY --become-pass-file=$BECOME_PASS --vault-pass-file=$VAULT_PASS --diff
+    - ansible-playbook configure.yml -i inventories/hosts.ini --private-key=./ssh_key --become-pass-file=$BECOME_PASS --vault-pass-file=$VAULT_PASS --diff
   rules:
     - if: '$CI_PIPELINE_SOURCE == "pipeline"'
       when: always
