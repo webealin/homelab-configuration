@@ -1,7 +1,10 @@
 - name: Create gitlab user
   ansible.builtin.user:
     name: gitlab
+    comment: Gitlab Service Account
     shell: /sbin/nologin
+    create_home: false
+    system: true
     state: present
 
 - name: Add python3-ldap package (required for ldap_entry module)

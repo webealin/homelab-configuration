@@ -4,6 +4,7 @@
     comment: Pihole Service Account
     shell: /sbin/nologin
     create_home: false
+    system: true
     state: present
   register: pihole_user
 
