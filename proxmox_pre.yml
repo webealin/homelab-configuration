@@ -10,6 +10,11 @@
   gather_facts: true
 
   tasks:
+    - name: Update local storage content via pvesm
+      ansible.builtin.command:
+        cmd: pvesm set local --content backup,iso,import,images,snippets,vztmpl
+      changed_when: true
+
     - name: Create terraform service account
       ansible.builtin.user:
         name: "{{ terraform_user }}"

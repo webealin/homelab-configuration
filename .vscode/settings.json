@@ -19,6 +19,7 @@
         "docker",
         "gitlab",
         "dns",
-        "security"
+        "security",
+        "proxmox"
     ]
 }
