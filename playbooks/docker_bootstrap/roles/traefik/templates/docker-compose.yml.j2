@@ -8,6 +8,10 @@ services:
     ports:
       - {{ http_port }}:80
       - {{ https_port }}:443
+{% if ansible_hostname == ldap_host %}
+      - {{ ldap_port }}:389
+      - {{ ldaps_port}}:636
+{% endif %}
     networks:
       - traefik_proxy
     volumes:

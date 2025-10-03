@@ -38,6 +38,13 @@ entryPoints:
       middlewares:
 #        - default-whitelist@file
         - secHeaders@file
+{% if ansible_hostname == ldap_host %}
+
+  ldap:
+    address: :389/tcp
+  ldaps:
+    address: :636/tcp
+{% endif %}
 
 # don't try to verify self signed certificates (e.g. proxmox)
 serversTransport:

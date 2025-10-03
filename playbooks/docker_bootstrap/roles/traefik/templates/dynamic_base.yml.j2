@@ -12,7 +12,7 @@ tls:
       curvePreferences:
         - CurveP521
         - CurveP384
-      sniStrict: true
+      sniStrict: {% if ansible_hostname == ldap_host %}true{% else %}false{% endif %}
 
 http:
   middlewares:

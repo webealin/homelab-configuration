@@ -5,6 +5,9 @@ openldap_image: latest
 openldap_domain: "{{ internal_domain }}"
 openldap_organisation: Homelab
 
-openldap_admin_enabled: false
 openldap_subdomain: ldap
-openldap_admin_url: "{{ openldap_subdomain }}.{{ internal_domain }}"
+openldap_url: "{{ openldap_subdomain }}.{{ internal_domain }}"
+
+openldap_admin_enabled: false
+openldap_admin_subdomain: ldapadmin
+openldap_admin_url: "{{ openldap_admin_subdomain }}.{{ internal_domain }}"

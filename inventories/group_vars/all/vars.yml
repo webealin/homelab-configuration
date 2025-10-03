@@ -15,7 +15,8 @@ ldap_services_base_dn: "ou=services,{{ ldap_base_dn }}"
 ldap_users_base_dn: "ou=users,{{ ldap_base_dn }}"
 ldap_config_password: "{{ vault_ldap_config_password }}"
 ldap_admin_password: "{{ vault_ldap_admin_password }}"
-ldap_server: "{{ hostvars['sldocker01h'].ansible_host }}"
+ldap_server: "ldap.internal.webernet-online.de"
+ldap_host: sldocker01h
 ldap_auth:
   server_uri: ldap://{{ ldap_server }}/
   bind_dn: "cn=admin,{{ ldap_base_dn }}"
@@ -25,6 +26,7 @@ ldap_auth:
 smtp_username: apikey
 smtp_password: "{{ vault_smtp_password }}"
 smtp_host: smtp.sendgrid.net
+# TODO: encrypted port 465
 smtp_port: 587
 smtp_sender_email: "{{ info_email }}"
 
