@@ -1,0 +1,12 @@
+gitlab_root_password: "{{ vault_gitlab_root_password }}"
+gitlab_postgres_password: "{{ vault_gitlab_postgres_password }}"
+gitlab_service_password: "{{ vault_gitlab_service_password }}"
+gitlab_redis_password: "{{ vault_gitlab_redis_password }}"
+gitlab_runner_token: "{{ vault_gitlab_runner_token }}"
+
+firewall_allowed_tcp_ports:
+  - "{{ ssh_port }}"
+  - "{{ http_port }}"
+  - "{{ https_port }}"
+  # gitlab SSH port
+  - "22"

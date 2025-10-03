@@ -1,0 +1,6 @@
+- name: Install software on Docker Host 02
+  hosts: sldocker02h
+  become: true
+
+  roles:
+    - gitlab
